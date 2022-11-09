@@ -30,7 +30,7 @@ public class AppleMusicApiController {
 
     // Apple Music API 에서 받아온 데이터 확인
     @GetMapping("/api/allow/info/basic")
-    public ResponseEntity allowBasic(){
+    public ResponseEntity<String> allowBasic(){
         StringBuilder result = new StringBuilder();
         try{
             // 한국에서 인기 많은 K-Pop 곡 30개 조회
@@ -71,7 +71,7 @@ public class AppleMusicApiController {
 
         if(result.length() != 0){
             appleMusicService.init(result.toString());
-            return new ResponseEntity(DefaultRes.res(StatusCode.OK, ResponseMessage.GET_MUSICS_FROM_APPLE_MUSIC_API_SUCCESS, result.toString()),HttpStatus.OK);
+            return new ResponseEntity<>(result.toString(),HttpStatus.OK); // 200
         }
         else{
             throw new CustomException(INVALID_DEVELOPER_TOKEN);
