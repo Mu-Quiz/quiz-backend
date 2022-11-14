@@ -33,7 +33,12 @@ dependencies {
 //    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
 //    implementation('org.springframework.session:spring-session-jdbc')
 //    implementation('org.springframework.boot:spring-boot-starter-security')
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude module : 'junit'
+    }
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testCompile("org.junit.jupiter:junit-jupiter-params")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine")
 //    testImplementation('org.springframework.security:spring-security-test')
 }
 
