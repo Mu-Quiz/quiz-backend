@@ -49,10 +49,19 @@ public class AppleMusicService {
                         .previews(previewsUrl)
                         .build();
 
-                musicRepository.save(music);
+                // 이미 DB에 있는 음악이 아니라면 저장
+                if(!isAlreadyExistsMusic(music)){
+                    musicRepository.save(music);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // 이미 DB에 있는 음악인지 체크
+    @Transactional
+    private boolean isAlreadyExistsMusic(Music music){
+        return musicRepository.findByAppleMusicId(music.getAppleMusicId()).isPresent();
     }
 }
