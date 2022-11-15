@@ -47,4 +47,8 @@ public class Music extends BaseTimeEntity {
         this.artwork = artwork;
         this.previews = previews;
     }
+
+    public void titleUpdate(String title){
+        this.title = title;
+    }
 }

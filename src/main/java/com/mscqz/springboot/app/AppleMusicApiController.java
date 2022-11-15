@@ -1,10 +1,8 @@
 package com.mscqz.springboot.app;
 
 import com.mscqz.springboot.app.exception.CustomException;
-import com.mscqz.springboot.app.response.DefaultRes;
-import com.mscqz.springboot.app.response.ResponseMessage;
-import com.mscqz.springboot.app.response.StatusCode;
 import com.mscqz.springboot.service.music.AppleMusicService;
+import com.mscqz.springboot.service.music.MusicService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +23,7 @@ import static com.mscqz.springboot.app.exception.ErrorCode.INVALID_DEVELOPER_TOK
 @Slf4j
 public class AppleMusicApiController {
     private final AppleMusicService appleMusicService;
+    private final MusicService musicService;
     @Value("${apple.token}")
     private String developerToken;
 
@@ -33,8 +32,8 @@ public class AppleMusicApiController {
     public ResponseEntity<String> allowBasic(){
         StringBuilder result = new StringBuilder();
         try{
-            // 한국에서 인기 많은 K-Pop 곡 30개 조회
-            URL url = new URL("https://api.music.apple.com/v1/catalog/kr/charts?types=songs&genre=51&limit=30");
+            // 한국에서 인기 많은 K-Pop 곡 100개 조회
+            URL url = new URL("https://api.music.apple.com/v1/catalog/kr/charts?types=songs&genre=51&limit=100");
 
             // 케이팝 장르 id는 51 체크
             URL url2 = new URL("https://api.music.apple.com/v1/catalog/kr/genres/51");
@@ -71,6 +70,7 @@ public class AppleMusicApiController {
 
         if(result.length() != 0){
             appleMusicService.init(result.toString());
+            musicService.musicTitleFiltering();
             return new ResponseEntity<>(result.toString(),HttpStatus.OK); // 200
         }
         else{
