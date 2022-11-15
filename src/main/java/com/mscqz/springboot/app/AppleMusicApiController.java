@@ -32,8 +32,8 @@ public class AppleMusicApiController {
     public ResponseEntity<String> allowBasic(){
         StringBuilder result = new StringBuilder();
         try{
-            // 한국에서 인기 많은 K-Pop 곡 30개 조회
-            URL url = new URL("https://api.music.apple.com/v1/catalog/kr/charts?types=songs&genre=51&limit=30");
+            // 한국에서 인기 많은 K-Pop 곡 100개 조회
+            URL url = new URL("https://api.music.apple.com/v1/catalog/kr/charts?types=songs&genre=51&limit=100");
 
             // 케이팝 장르 id는 51 체크
             URL url2 = new URL("https://api.music.apple.com/v1/catalog/kr/genres/51");
