@@ -43,8 +43,8 @@ public class MusicService {
                 String excludeAfterBracket = music.getTitle().substring(0, music.getTitle().indexOf("(")-1);
                 music.titleUpdate(excludeAfterBracket);
             }
-            // 한국어와 띄어쓰기 이외에 다른 글자가 있는 제목 또는 띄어쓰기 제외 7자 초과 제목의 음악일 경우, 삭제
-            if(!Pattern.matches("^[가-힣\\s]*$", music.getTitle()) || music.getTitle().replaceAll("[^a-zA-Zㄱ-힣]", "").length() > TITLE_LENGTH_LIMIT){
+            // 한글, 한글 자음, 숫자, 띄어쓰기 이외에 다른 글자가 있는 제목 OR 띄어쓰기 제외 7자 초과 제목의 음악일 경우, 삭제
+            if(!Pattern.matches("^[ㄱ-힣\\s\\d]*$", music.getTitle()) || music.getTitle().replaceAll("[^a-zA-Zㄱ-힣\\d]", "").length() > TITLE_LENGTH_LIMIT){
                 log.info("삭제예정 음악 : {}", music.getTitle());
                 musicRepository.delete(music);
             }
