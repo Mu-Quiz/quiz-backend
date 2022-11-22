@@ -40,12 +40,13 @@ public class AppleMusicService {
                 String previewsUrl = parsePreviews.get("url").toString();
                 String title = parseAttributes.get("name").toString();
                 String artistName = parseAttributes.get("artistName").toString();
+                String setArtworkWidthAndHeight = setArtworkSize(artworkUrl);
 
                 Music music = Music.builder()
                         .appleMusicId(appleMusicId)
                         .title(title)
                         .artistName(artistName)
-                        .artwork(artworkUrl)
+                        .artwork(setArtworkWidthAndHeight)
                         .previews(previewsUrl)
                         .build();
 
@@ -63,5 +64,11 @@ public class AppleMusicService {
     @Transactional
     private boolean isAlreadyExistsMusic(Music music){
         return musicRepository.findByAppleMusicId(music.getAppleMusicId()).isPresent();
+    }
+
+    // 앨범 아트 사진 width : 1000, height : 1000으로 지정
+    @Transactional
+    private String setArtworkSize(String artworkUrl){
+        return artworkUrl.replace("{w}", "1000").replace("{h}", "1000");
     }
 }
