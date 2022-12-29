@@ -50,5 +50,16 @@ public class AppleToken {
         public String getTokenType(){
             return token_type;
         }
+
+        @Override
+        public String toString() {
+            return "AppleIdTokenResponse{" +
+                    "access_token='" + access_token + '\'' +
+                    ", token_type='" + token_type + '\'' +
+                    ", expires_in='" + expires_in + '\'' +
+                    ", refresh_token='" + refresh_token + '\'' +
+                    ", id_token='" + id_token + '\'' +
+                    '}';
+        }
     }
 }
