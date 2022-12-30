@@ -1,9 +1,11 @@
 package com.mscqz.springboot.config.auth.dto;
 
+import lombok.Getter;
 import lombok.Setter;
 
 public class AppleToken {
     @Setter
+    @Getter
     public static class Request {
         private String code;
         private String client_id; // bundle 적어주면 됨
@@ -11,9 +13,17 @@ public class AppleToken {
         private String grant_type;
         private String refresh_token;
 
-        public static Request of(String code, String clientId, String clientSecret, String grantType, String refreshToken){
+        public static Request ofCode(String clientId, String clientSecret, String code, String grantType){
             Request request = new Request();
+            request.client_id = clientId;
+            request.client_secret = clientSecret;
             request.code = code;
+            request.grant_type = grantType;
+            return request;
+        }
+
+        public static Request ofRefreshToken(String clientId, String clientSecret, String grantType, String refreshToken){
+            Request request = new Request();
             request.client_id = clientId;
             request.client_secret = clientSecret;
             request.grant_type = grantType;

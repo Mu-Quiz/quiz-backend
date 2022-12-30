@@ -9,19 +9,19 @@ import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -121,20 +121,27 @@ public class AppleJwtUtils {
                 .setExpiration(expirationDate)
                 .setAudience("https://appleid.apple.com")
                 .setSubject(APP_BUNDLE)
-                .signWith(SignatureAlgorithm.ES256, getPrivateKey())
+                .signWith(SignatureAlgorithm.ES256, getPrivateKey("EC"))
                 .compact();
     }
 
     // p8 파일에 있는 private key 가져오기
-    private PrivateKey getPrivateKey() throws IOException {
+    private PrivateKey getPrivateKey(String algorithm) throws IOException {
         ClassPathResource resource = new ClassPathResource(KEY_PATH);
-        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-        Reader pemReader = new StringReader(privateKey);
-        PEMParser pemParser = new PEMParser(pemReader);
-        JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-        PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-        log.info("p8 파일에 있는 private key 가져오기 완료");
-        return converter.getPrivateKey(object);
+        String content = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+
+        try {
+            String privateKey = content.replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s+", "");
+
+            KeyFactory kf = KeyFactory.getInstance(algorithm);
+            return kf.generatePrivate(new PKCS8EncodedKeySpec(Base64Utils.decodeFromUrlSafeString(privateKey)));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Java did not support the algorithm:" + algorithm, e);
+        } catch (InvalidKeySpecException e) {
+            throw new RuntimeException("Invalid key format");
+        }
     }
 
     // identity_token 서명 검증 (데이터 신뢰 검증 메소드)
@@ -150,15 +157,14 @@ public class AppleJwtUtils {
     }
 
     // Authorization_code 검증
-    public AppleToken.Response getTokenByCode(String clientSecret, String code) throws IOException{
-        AppleToken.Request request = AppleToken.Request.of(code, APP_BUNDLE, clientSecret, "authorization_code", null);
-        return appleClient.getToken(request);
+    public AppleToken.Response getTokenByCode(String clientSecret, String code) throws IOException, URISyntaxException {
+        AppleToken.Request request = AppleToken.Request.ofCode(APP_BUNDLE, clientSecret, code, "authorization_code");
+        return appleClient.checkAuthorizationCode(request);
     }
 
     // Refresh_token 검증
-    public AppleToken.Response getTokenByRefreshToken(String clientSecret, String refreshToken) throws IOException{
-        AppleToken.Request request = AppleToken.Request.of(null, APP_BUNDLE, clientSecret, "refresh_token", refreshToken);
-        return appleClient.getToken(request);
+    public AppleToken.Response getTokenByRefreshToken(String clientSecret, String refreshToken) throws IOException, URISyntaxException {
+        AppleToken.Request request = AppleToken.Request.ofRefreshToken(APP_BUNDLE, clientSecret, "refresh_token", refreshToken);
+        return appleClient.checkRefreshToken(request);
     }
-
 }
