@@ -13,7 +13,7 @@ public enum ErrorCode {
     /* 400 BAD_REQUEST : 잘못된 요청 */
     MISMATCH_REFRESH_TOKEN(BAD_REQUEST, "리프레시 토큰의 유저 정보가 일치하지 않습니다"),
     CANNOT_FOLLOW_MYSELF(BAD_REQUEST, "자기 자신은 팔로우 할 수 없습니다"),
-    MISMATCH_LOGIN_REQUEST(BAD_REQUEST, "로그인 요청 시에 필요한 값들이 잘못되었습니다. refresh_token, identity_token, authorization_code 셋 모두 빈 값이 아닌지 확인하세요."),
+    MISMATCH_LOGIN_REQUEST(BAD_REQUEST, "로그인 요청 시에 필요한 값들이 잘못되었습니다."),
 
     /* 401 UNAUTHORIZED : 인증되지 않은 사용자 */
     INVALID_AUTH_TOKEN(UNAUTHORIZED, "권한 정보가 없는 토큰입니다"),
