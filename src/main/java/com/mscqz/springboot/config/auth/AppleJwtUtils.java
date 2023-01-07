@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Base64Utils;
+import org.springframework.util.FileCopyUtils;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -127,8 +127,9 @@ public class AppleJwtUtils {
 
     // p8 파일에 있는 private key 가져오기
     private PrivateKey getPrivateKey(String algorithm) throws IOException {
-        ClassPathResource resource = new ClassPathResource(KEY_PATH);
-        String content = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+        ClassPathResource classPathResource = new ClassPathResource(KEY_PATH);
+        byte[] bData = FileCopyUtils.copyToByteArray(classPathResource.getInputStream());
+        String content = new String(bData, StandardCharsets.UTF_8);
 
         try {
             String privateKey = content.replace("-----BEGIN PRIVATE KEY-----", "")
