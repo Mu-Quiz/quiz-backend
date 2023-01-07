@@ -25,7 +25,7 @@ public class AppleLoginController {
 
 
     // apple login
-    @GetMapping("/api/v1/apple/login")
+    @PostMapping("/api/v1/apple/login")
     public ResponseEntity<LoginResponseDto> appleLogin(@RequestBody LoginRequestDto loginRequestDto) throws Exception {
         Claims claims = appleJwtUtils.getClaimsBy(loginRequestDto.getIdentityToken()); // identityToken으로 사용자 정보 받아오기
         if (loginRequestDto.getRefreshToken().length() != 0 || (loginRequestDto.getIdentityToken().length() != 0 && loginRequestDto.getAuthorizationCode().length() != 0)) {
@@ -41,7 +41,7 @@ public class AppleLoginController {
             }
             else { // 처음 로그인(회원가입)
                 // 새로운 사용자 생성
-                return new ResponseEntity<>(appleLoginService.signUpWithApple(loginRequestDto, claims), HttpStatus.OK); // 200
+                return new ResponseEntity<>(appleLoginService.signUpWithApple(loginRequestDto, claims), HttpStatus.CREATED); // 201
             }
         }
         else { // 잘못된 로그인 요청(요청 값이 제대로 오지 않은 경우)
